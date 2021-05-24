@@ -153,6 +153,14 @@ describe LinAlgRb::Vector do
 
       expect(vect.unit_vector(norm_type)).to eq expected_unit_vect
     end
+
+    it 'raises a StandardError for the zero vector' do
+      vect = described_class.new([0, 0, 0])
+
+      expect do
+        vect.unit_vector
+      end.to raise_error(StandardError, 'The zero vector cannot be normalized.')
+    end
   end
 
   describe '.is_unit_vector?' do

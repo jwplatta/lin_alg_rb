@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LinAlgRb
   class Vector
     def initialize(coordinates)
@@ -74,12 +76,18 @@ module LinAlgRb
 
     private
 
+    """
+    Normalization:
+    1. Find magnitude
+    2. Multiply the vector by the inverse of its magnitude
+    """
     def normalize(norm_type=2)
-      """
-      1. Find magnitude
-      2. Multiply the vector by the inverse of its magnitude
-      """
-      coordinates.map { |v| v * (1.0 / magnitude(norm_type)) }
+      inv_magnitude = (1.0 / magnitude(norm_type))
+      raise ZeroDivisionError if inv_magnitude == Float::INFINITY
+
+      coordinates.map { |v| v * inv_magnitude }
+    rescue ZeroDivisionError
+      raise StandardError.new('The zero vector cannot be normalized.')
     end
   end
 end
