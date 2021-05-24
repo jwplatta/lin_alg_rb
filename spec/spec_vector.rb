@@ -154,4 +154,21 @@ describe LinAlgRb::Vector do
       expect(vect.unit_vector(norm_type)).to eq expected_unit_vect
     end
   end
+
+  describe '.is_unit_vector?' do
+    it 'returns true' do
+      coordinates = [3, 4, 5]
+      vect = LinAlgRb::Vector.new(coordinates)
+      unit_vector = LinAlgRb::Util.unit_vector(vect)
+
+      expect(unit_vector.is_unit_vector?).to be true
+    end
+
+    it 'returns false' do
+      coordinates = [3, 4, 5]
+      vect = LinAlgRb::Vector.new(coordinates)
+
+      expect(vect.is_unit_vector?).to be false
+    end
+  end
 end

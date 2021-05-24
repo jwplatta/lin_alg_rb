@@ -20,6 +20,10 @@ module LinAlgRb
       @unit_vector = normalize(norm_type)
     end
 
+    def is_unit_vector?(norm_type=2)
+      magnitude(norm_type) == 1.0
+    end
+
     def mult_scalar(other)
       raise TypeError.new('Other is not a scalar') unless other.is_a? Numeric
 
