@@ -2,6 +2,7 @@
 
 require_relative 'lin_alg_rb/version'
 require_relative 'lin_alg_rb/vector'
+require_relative 'lin_alg_rb/util'
 
 module LinAlgRb
   class Error < StandardError; end
