@@ -166,7 +166,7 @@ describe LinAlgRb::Vector do
   describe '.is_unit_vector?' do
     it 'returns true' do
       coordinates = [3, 4, 5]
-      vect = LinAlgRb::Vector.new(coordinates)
+      vect = described_class.new(coordinates)
       unit_vector = LinAlgRb::Util.unit_vector(vect)
 
       expect(unit_vector.is_unit_vector?).to be true
@@ -174,9 +174,27 @@ describe LinAlgRb::Vector do
 
     it 'returns false' do
       coordinates = [3, 4, 5]
-      vect = LinAlgRb::Vector.new(coordinates)
+      vect = described_class.new(coordinates)
 
       expect(vect.is_unit_vector?).to be false
+    end
+  end
+
+  describe '#dot_product' do
+    it 'returns the correct scalar value' do
+      vect = described_class.new([1,2])
+      other = described_class.new([3,4])
+
+      expect(vect.dot_product(other)).to eq 11
+    end
+
+    it 'raises StandardError when vectors have different dimensions' do
+      vect = described_class.new([1,2])
+      other = described_class.new([3,4,5])
+
+      expect do
+        vect.dot_product(other)
+      end.to raise_error(StandardError, 'Vectors must have the same dimension')
     end
   end
 end
