@@ -12,6 +12,16 @@ module LinAlgRb
 
     attr_reader :coordinates, :dimension
 
+    def dot_product(other)
+      raise ArgumentError.new('Vectors must have the same dimension') unless other.dimension == dimension
+
+      other_coordinates = other.coordinates
+
+      (0...dimension).inject(0) do |sum, idx|
+        sum + (coordinates[idx] * other_coordinates[idx])
+      end
+    end
+
     def magnitude(norm_type=2)
       coordinates.inject(0) { |sum, v| sum + v**norm_type }
         .then { |summed_v| summed_v ** (1.0 / norm_type) }
@@ -76,11 +86,9 @@ module LinAlgRb
 
     private
 
-    """
-    Normalization:
-    1. Find magnitude
-    2. Multiply the vector by the inverse of its magnitude
-    """
+    # Normalization:
+    # 1. Find magnitude
+    # 2. Multiply the vector by the inverse of its magnitude
     def normalize(norm_type=2)
       inv_magnitude = (1.0 / magnitude(norm_type))
       raise ZeroDivisionError if inv_magnitude == Float::INFINITY
