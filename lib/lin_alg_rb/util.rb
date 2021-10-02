@@ -16,5 +16,10 @@ module LinAlgRb
     def self.is_unit_vector?(vector, norm_type=2)
       LinAlgRb::Util.magnitude(vector, norm_type) == 1.0
     end
+
+    def self.radians_to_degrees(radians)
+      degrees_per_radian = 180.0 / Math::PI
+      radians * degrees_per_radian
+    end
   end
 end
