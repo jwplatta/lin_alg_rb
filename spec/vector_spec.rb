@@ -10,12 +10,6 @@ describe LinAlgRb::Vector do
       expect(vect.dimension).to eq(2)
     end
 
-    it 'raises TypeError when coordinates are not passed as an Array' do
-      expect do
-        described_class.new(1)
-      end.to raise_error(TypeError, 'Coordinates must be an array')
-    end
-
     it 'raises ArgumentError when size of coordinates is not two or more' do
       expect do
         described_class.new([1])
@@ -156,22 +150,22 @@ describe LinAlgRb::Vector do
     end
   end
 
-  describe '.is_unit_vector?' do
+  describe '.unit_vector?' do
     it 'returns true' do
       coordinates = [3, 4, 5]
       unit_vector = described_class.new(coordinates).unit_vector
-      expect(unit_vector.is_unit_vector?).to be true
+      expect(unit_vector.unit_vector?).to be true
     end
     it 'returns false' do
       coordinates = [3, 4, 5]
       vect = described_class.new(coordinates)
-      expect(vect.is_unit_vector?).to be false
+      expect(vect.unit_vector?).to be false
     end
   end
 
   describe '#dot' do
     it 'returns the correct scalar value' do
-      vect = described_class.new([1,2])
+      vect = described_class.new(1,2)
       other = described_class.new([3,4])
 
       expect(vect.dot(other)).to eq 11
@@ -210,45 +204,45 @@ describe LinAlgRb::Vector do
     end
   end
 
-  describe '#is_parallel?' do
+  describe '#parallel?' do
     it 'returns false' do
       v1 = described_class.new([-2.029, 9.97, 4.172])
       v2 = described_class.new([-9.231, -6.639, -7.245])
-      expect(v1.is_parallel?(v2)).to be false
+      expect(v1.parallel?(v2)).to be false
     end
 
     it 'returns true' do
       v1 = described_class.new([-7.579, -7.88])
       v2 = described_class.new([22.737, 23.64])
-      expect(v1.is_parallel?(v2)).to be true
+      expect(v1.parallel?(v2)).to be true
     end
     context 'zero vector' do
       it 'returns true' do
         v1 = described_class.new([2.118, 4.827])
         v2 = described_class.new([0, 0])
-        expect(v1.is_parallel?(v2)).to be true
+        expect(v1.parallel?(v2)).to be true
       end
     end
   end
 
-  describe '#is_orthogonal?' do
+  describe '#orthogonal?' do
     it 'returns false' do
       v1 = described_class.new([-7.579, -7.88])
       v2 = described_class.new([22.737, 23.64])
-      expect(v1.is_orthogonal?(v2)).to be false
+      expect(v1.orthogonal?(v2)).to be false
     end
 
     it 'returns true' do
       v1 = described_class.new([-2.328, -7.284, -1.214])
       v2 = described_class.new([-1.821, 1.072, -2.94])
-      expect(v1.is_orthogonal?(v2)).to be true
+      expect(v1.orthogonal?(v2)).to be true
     end
 
     context 'zero vector' do
       it 'returns true' do
         v1 = described_class.new([2.118, 4.827])
         v2 = described_class.new([0, 0])
-        expect(v1.is_orthogonal?(v2)).to be true
+        expect(v1.orthogonal?(v2)).to be true
       end
     end
   end
@@ -288,6 +282,13 @@ describe LinAlgRb::Vector do
       v2 = described_class.new([3,4])
       expected = described_class.new([3, 8])
       expect(v1 * v2).to eq expected
+    end
+  end
+
+  describe '#[]' do
+    it do
+      v1 = described_class.new([1,2,3,4,5])
+      expect(v1[2]).to eq 3
     end
   end
 end

@@ -1,11 +1,13 @@
-require 'singleton'
 # frozen_string_literal: true
+
+require 'singleton'
+
 module LinAlgRb
   class Vector
-    def initialize(coordinates)
+    def initialize(*coordinates)
+      coordinates = coordinates.flatten
       raise TypeError.new('Coordinates must be an array') unless coordinates.is_a? Array
       raise ArgumentError.new('Coordinates cannot be empty') unless coordinates.count >= 2
-
       @coordinates = coordinates
       @dimension = coordinates.count
     end
@@ -35,11 +37,11 @@ module LinAlgRb
       Vector.new(normalize(norm_type))
     end
 
-    def is_unit_vector?(norm_type=2)
+    def unit_vector?(norm_type=2)
       magnitude(norm_type) == 1.0
     end
 
-    def is_zero?(tolerance=1e-10)
+    def zero?(tolerance=1e-10)
       magnitude < tolerance
     end
 
@@ -91,6 +93,10 @@ module LinAlgRb
       Vector.new(new_coordinates)
     end
 
+    def [](index)
+      coordinates[index]
+    end
+
     def to_s
       "Vector: {#{coordinates.join(',')}}"
     end
@@ -103,8 +109,8 @@ module LinAlgRb
       coordinates == other.coordinates
     end
 
+    # NOTE: defaults to radians
     def angle(other, degrees=false)
-      # NOTE: returns radians
       unit_vector.dot(other.unit_vector).then do |dot_product|
         if dot_product < -1.0 or dot_product > 1.0
           dot_product = dot_product.round(2)
@@ -118,14 +124,14 @@ module LinAlgRb
       end
     end
 
-    def is_parallel?(other)
-      self.is_zero? \
-        or other.is_zero? \
-        or angle(other) == 0 \
+    def parallel?(other, to_decimal: 10)
+      self.zero? \
+        or other.zero? \
+        or angle(other).round(to_decimal) == 0.0 \
         or angle(other) == Math::PI
     end
 
-    def is_orthogonal?(other, tolerance=1e-10)
+    def orthogonal?(other, tolerance=1e-10)
       dot(other).abs < tolerance
     end
 
@@ -165,14 +171,14 @@ module LinAlgRb
     end
 
     def magnitude; 0 end
-    def is_unit_vector?; false end
-    def is_zero?; true end
+    def unit_vector?; false end
+    def zero?; true end
     def eql?; false end
 
     # NOTE: Zero vector is parallel and orthogonal to all other vectors.
     # And it is orthogonal to itself.
-    def is_parallel?; true end
-    def is_orthogonal?; true end
+    def parallel?; true end
+    def orthogonal?; true end
 
     def unit_vector
       raise StandardError.new("Zero vector has no normalization.")
