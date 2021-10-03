@@ -291,4 +291,13 @@ describe LinAlgRb::Vector do
       expect(v1[2]).to eq 3
     end
   end
+
+  describe '#cross' do
+    it 'returns the correct vector' do
+      v1 = described_class.new(5, 3, -2)
+      v2 = described_class.new(-1, 0, 3)
+
+      expect(v1.cross(v2).coordinates).to eq [9, -13, 3]
+    end
+  end
 end
