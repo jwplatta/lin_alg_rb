@@ -28,6 +28,19 @@ module LinAlgRb
       end
     end
 
+    def cross(other)
+      raise ArgumentError.new("Vectors must have dimension 3.") if dimension != 3 or other.dimension != 3
+
+      x1, y1, z1 = coordinates
+      x2, y2, z2 = other.coordinates
+
+      Vector.new([
+        y1 * z2 - y2 * z1,
+        -(x1 * z2 - x2 * z1),
+        x1 * y2 - x2 * y1
+      ])
+    end
+
     def magnitude(norm_type=2)
       coordinates.inject(0) { |sum, v| sum + v**norm_type }
         .then { |summed_v| summed_v ** (1.0 / norm_type) }
@@ -163,25 +176,23 @@ module LinAlgRb
     end
   end
 
-  class ZeroVector < Vector
-    include Singleton
-
-    def initialize(dimension)
+  class NullVector < Vector
+    def initialize(dimension: 2)
       super([0] * dimension)
     end
 
     def magnitude; 0 end
     def unit_vector?; false end
-    def zero?; true end
+    def zero?; false end
     def eql?; false end
 
     # NOTE: Zero vector is parallel and orthogonal to all other vectors.
     # And it is orthogonal to itself.
-    def parallel?; true end
-    def orthogonal?; true end
+    def parallel?; false end
+    def orthogonal?; false end
 
     def unit_vector
-      raise StandardError.new("Zero vector has no normalization.")
+      raise StandardError.new("Null vector has no normalization.")
     end
   end
 end
