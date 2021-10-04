@@ -6,8 +6,10 @@ module LinAlgRb
   end
 
   class Plane
-    def initialize(normal_vector:, constant_term: 0)
-      raise ArgumentError.new("The normal vector needs to be an instance of LinAlgRb::Vector") if normal_vector.class != LinAlgRb::Vector
+    def initialize(normal_vector: LinAlgRb::NullVector.new(dimension: 3), constant_term: 0)
+      if normal_vector.class != LinAlgRb::Vector and normal_vector.class.superclass != LinAlgRb::Vector
+        raise ArgumentError.new("The normal vector needs to be an instance of LinAlgRb::Vector")
+      end
       @normal_vector = normal_vector
       @dimension = normal_vector.dimension
       @constant_term = constant_term
@@ -31,7 +33,7 @@ module LinAlgRb
     def to_s
       decimal_places = 3
       vars = ('a'..'z').to_a
-      init_index = index_first_nonzero_element(normal_vector.coordinates)
+      init_index = first_nonzero_element_index
 
       terms = (0...dimension).map do |index|
         coef = normal_vector[index].round(decimal_places)
@@ -65,24 +67,24 @@ module LinAlgRb
     end
 
     def find_basepoint
-      elm_idx = index_first_nonzero_element(normal_vector.coordinates)
+      elm_idx = first_nonzero_element_index
       init_coef = normal_vector[elm_idx]
 
       ([0] * dimension).then do |basepoint_coord|
         basepoint_coord[elm_idx] = (constant_term / init_coef.to_f)
         LinAlgRb::Vector.new(basepoint_coord)
       end
-    rescue NoNonZeroElements
-      @basepoint = nil
+    rescue NoNoneZeroElements
+      @basepoint = LinAlgRb::NullVector.new(dimension: dimension)
     end
 
-    private
-
-    def index_first_nonzero_element(elements)
-      elm = elements.find_index { |e| !near_zero?(e) }
+    def first_nonzero_element_index
+      elm = normal_vector.coordinates.find_index { |e| !near_zero?(e) }
       raise NoNoneZeroElements.new unless elm
       elm
     end
+
+    private
 
     def near_zero?(numeric, tolerance: 1e-10)
       numeric.abs < tolerance
