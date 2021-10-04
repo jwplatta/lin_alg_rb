@@ -26,6 +26,10 @@ module LinAlgRb
       self.==(other)
     end
 
+    def [](index)
+      normal_vector[index]
+    end
+
     def ==(other)
       (basepoint - other.basepoint).orthogonal?(normal_vector)
     end

@@ -5,6 +5,18 @@ module LinAlgRb
     end
   end
 
+  class LinSysNoSolution < StandardError
+    def initialize
+      super("The linear system has no solution.")
+    end
+  end
+
+  class LinSysInfiniteSolutions < StandardError
+    def initialize
+      super("The linear system has infinitely many solutions.")
+    end
+  end
+
   class LinSys
     def initialize(planes: [])
       if planes.any?
@@ -18,6 +30,73 @@ module LinAlgRb
     end
 
     attr_reader :planes, :dimension
+
+    def solve
+      # NOTE: returns
+      #   1. Vector object if there is a unique solution
+      #   2. No solution: raise LinSysNoSolution
+      #   3. Infinite solutions: raise LinSysInfiniteSolutions
+
+      # STEP: get rref
+      rref = to_rref
+      # STEP: check for contradiction
+      raise LinSysNoSolution.new if rref.contradiction?
+      # STEP: check for pivot variable count
+      raise LinSysInfiniteSolutions.new if rref.pivot_variable_cnt < rref.dimension
+      # STEP: get solution coordinates and return new vector
+
+      (0...rref.dimension).map { |index| rref.planes[index].constant_term }.then do |coordinates|
+        LinAlgRb::Vector.new(*coordinates)
+      end
+    end
+
+    def pivot_variable_cnt
+      first_nonzero_term_indices.count { |index| index >= 0 }
+    end
+
+    def contradiction?
+      planes.each do |plane|
+        plane.first_nonzero_element_index
+      rescue NoNoneZeroElements
+        return true if !near_zero?(plane.constant_term)
+      end
+
+      false
+    end
+
+    def to_rref
+      tri = LinSys.new(planes: to_triangular_form.planes.map(&:clone))
+
+      equation_cnt = tri.planes.count
+      # for each Row in tri.planes.reverse
+      (0...equation_cnt).reverse_each do |eq_idx|
+        row = tri[eq_idx]
+        #   if no non-zero coef in Row
+        #     go to next row
+        #   index_first_non_zero_coef in Row
+        term_idx = row.first_nonzero_element_index
+        #   scale Row to make Coef at index_first_non_zero_coef be equal to 1
+        scaled_row = tri[eq_idx] = tri.mult_coef_and_row((1 / row[term_idx].to_f), eq_idx)
+        coef = scaled_row[term_idx]
+        #   clear all terms with Coef in rows above Row (or after row if you reverse the array)
+        (0...eq_idx).reverse_each do |next_eq_idx|
+          next_eq_coef = tri[next_eq_idx].normal_vector[term_idx]
+
+          unless next_eq_coef.zero?
+            multiple = if (coef.positive? and next_eq_coef.negative?) or (coef.negative? and next_eq_coef.positive?)
+              (next_eq_coef.abs / coef.abs.to_f)
+            else
+              -(next_eq_coef.abs / coef.abs.to_f)
+            end
+
+            tri[next_eq_idx] = tri.add_mult_times_row_to_row(multiple, eq_idx, next_eq_idx)
+          end
+        end
+      rescue NoNoneZeroElements
+        next
+      end
+      tri
+    end
 
     def to_triangular_form
       # NOTE: swap with topmost row below current row
@@ -103,13 +182,11 @@ module LinAlgRb
       )
     end
 
-    def first_nonzero_terms_indices
+    def first_nonzero_term_indices
       planes.map do |plane|
-        begin
           plane.first_nonzero_element_index
-        rescue LinAlgRb::NoNonZeroElements
-          -1
-        end
+      rescue LinAlgRb::NoNoneZeroElements
+        -1
       end
     end
 

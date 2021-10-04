@@ -26,9 +26,9 @@ describe LinAlgRb::LinSys do
       described_class.new(planes: [planeA, planeC])
     end.to raise_error(LinAlgRb::PlanesNotSameDimension)
   end
-  describe '#first_nonzero_terms_indices' do
+  describe '#first_nonzero_term_indices' do
     it do
-      expect(described_class.new(planes: [planeA, planeB]).first_nonzero_terms_indices).to eq [0, 0]
+      expect(described_class.new(planes: [planeA, planeB]).first_nonzero_term_indices).to eq [0, 0]
     end
   end
   describe '#swap_rows' do
@@ -163,7 +163,8 @@ describe LinAlgRb::LinSys do
       end
     end
   end
-  xdescribe '#to_rref' do
+
+  describe '#to_rref' do
     context 'two planes' do
       it do
         plane1 = LinAlgRb::Plane.new(
@@ -180,7 +181,6 @@ describe LinAlgRb::LinSys do
           normal_vector: LinAlgRb::Vector.new(1,0,0),
           constant_term: -1
         )
-
         expect(lin_sys[0]).to eq expected_plane1
         expect(lin_sys[1]).to eq plane2
       end
@@ -200,7 +200,6 @@ describe LinAlgRb::LinSys do
         expected_plane2 = LinAlgRb::Plane.new(
           constant_term: 1
         )
-
         expect(lin_sys[0]).to eq plane1
         expect(lin_sys[1]).to eq expected_plane2
       end
@@ -272,6 +271,66 @@ describe LinAlgRb::LinSys do
         expect(lin_sys[0]).to eq expected_plane1
         expect(lin_sys[1]).to eq expected_plane2
         expect(lin_sys[2]).to eq expected_plane3
+      end
+    end
+  end
+
+  describe '#solve' do
+    context 'two planes' do
+      it do
+        plane1 = LinAlgRb::Plane.new(
+          normal_vector: LinAlgRb::Vector.new(5.862,1.178,-10.366),
+          constant_term: -8.15
+        )
+        plane2 = LinAlgRb::Plane.new(
+          normal_vector: LinAlgRb::Vector.new(-2.931,-0.589,5.183),
+          constant_term: -4.075
+        )
+        expect do
+          described_class.new(planes: [plane1, plane2]).solve
+        end.to raise_error(LinAlgRb::LinSysNoSolution)
+      end
+    end
+    context 'three planes' do
+      it do
+        plane1 = LinAlgRb::Plane.new(
+          normal_vector: LinAlgRb::Vector.new(8.631,5.112,-1.816),
+          constant_term: -5.113
+        )
+        plane2 = LinAlgRb::Plane.new(
+          normal_vector: LinAlgRb::Vector.new(4.315,11.132,-5.27),
+          constant_term: -6.775
+        )
+        plane3 = LinAlgRb::Plane.new(
+          normal_vector: LinAlgRb::Vector.new(-2.158,3.01,-1.727),
+          constant_term: -0.831
+        )
+        expect do
+          described_class.new(planes: [plane1, plane2, plane3]).solve
+        end.to raise_error(LinAlgRb::LinSysInfiniteSolutions)
+      end
+    end
+    context 'four planes' do
+      it do
+        plane1 = LinAlgRb::Plane.new(
+          normal_vector: LinAlgRb::Vector.new(5.262,2.739,-9.878),
+          constant_term: -3.441
+        )
+        plane2 = LinAlgRb::Plane.new(
+          normal_vector: LinAlgRb::Vector.new(5.111,6.358,7.638),
+          constant_term: -2.152
+        )
+        plane3 = LinAlgRb::Plane.new(
+          normal_vector: LinAlgRb::Vector.new(2.016,-9.924,-1.367),
+          constant_term: -9.278
+        )
+        plane4 = LinAlgRb::Plane.new(
+          normal_vector: LinAlgRb::Vector.new(2.167,-13.543,-18.883),
+          constant_term: -10.567
+        )
+        solution_vector = described_class.new(planes: [plane1, plane2, plane3, plane4]).solve
+
+        expect(solution_vector.coordinates.map { |c| c.round(3) }).to eq [-1.177,0.707,-0.083]
       end
     end
   end
