@@ -17,6 +17,45 @@ module LinAlgRb
     end
   end
 
+  class Parametrization
+    def initialize(basepoint, direction_vectors)
+      @basepoint = basepoint
+      @direction_vectors = direction_vectors
+      @dimension = basepoint.dimension
+    end
+
+    attr_reader :basepoint, :direction_vectors, :dimension
+
+    def coordinates
+      basepoint.coordinates
+    end
+
+    def ==(other)
+      basepoint == other.basepoint and direction_vectors == other.direction_vectors
+    end
+
+    def to_s
+      output = ''
+      (0...dimension).each do |coord|
+        output += "x#{coord + 1} = "
+        unless basepoint[coord].round(3) == 0.0
+          output += "#{basepoint[coord].round(3)}"
+        end
+
+        direction_vectors.each_with_index do |vector, idx|
+          if vector[coord].round(3) != 0.0
+            output += " + " unless output[-2..] == "= "
+            output += "#{vector[coord].round(3)}(t#{idx + 1}) "
+          else
+            ""
+          end
+        end
+        output += "\n"
+      end
+      output
+    end
+  end
+
   class LinSys
     def initialize(planes: [])
       if planes.any?
@@ -42,12 +81,45 @@ module LinAlgRb
       # STEP: check for contradiction
       raise LinSysNoSolution.new if rref.contradiction?
       # STEP: check for pivot variable count
-      raise LinSysInfiniteSolutions.new if rref.pivot_variable_cnt < rref.dimension
+      # raise LinSysInfiniteSolutions.new if rref.pivot_variable_cnt < rref.dimension
       # STEP: get solution coordinates and return new vector
-
-      (0...rref.dimension).map { |index| rref.planes[index].constant_term }.then do |coordinates|
-        LinAlgRb::Vector.new(*coordinates)
+      if rref.pivot_variable_cnt < rref.dimension
+        parametrize(rref)
+      else
+        rref.planes.map(&:constant_term).select { |ct| ct != 0.0 }.then do |coordinates|
+          LinAlgRb::Vector.new(*coordinates)
+        end
       end
+    end
+
+    def parametrize(rref)
+      pivot_indices = rref.first_nonzero_term_indices
+      free_var_indices = (0...rref.dimension).to_a - rref.first_nonzero_term_indices
+
+      direction_vectors = free_var_indices.map do |free_var_idx|
+        vector_coord = [0] * rref.dimension
+        vector_coord[free_var_idx] = 1
+
+        rref.planes.each_with_index do |plane, idx|
+          pivot_var = pivot_indices[idx]
+          break if pivot_var < 0
+          vector_coord[pivot_var] = -1 * plane.normal_vector[free_var_idx]
+        end
+        LinAlgRb::Vector.new(vector_coord)
+      end
+
+      basepoint_coords = [0] * rref.dimension
+
+      rref.planes.each_with_index do |plane, idx|
+        pivot_var = pivot_indices[idx]
+        break if pivot_var < 0
+        basepoint_coords[pivot_var] = plane.constant_term # unless
+      end
+
+      Parametrization.new(
+        LinAlgRb::Vector.new(basepoint_coords),
+        direction_vectors
+      )
     end
 
     def pivot_variable_cnt

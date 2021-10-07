@@ -292,7 +292,7 @@ describe LinAlgRb::LinSys do
       end
     end
     context 'three planes' do
-      it do
+      xit do
         plane1 = LinAlgRb::Plane.new(
           normal_vector: LinAlgRb::Vector.new(8.631,5.112,-1.816),
           constant_term: -5.113
@@ -332,6 +332,67 @@ describe LinAlgRb::LinSys do
 
         expect(solution_vector.coordinates.map { |c| c.round(3) }).to eq [-1.177,0.707,-0.083]
       end
+    end
+  end
+
+  describe 'parametrization' do
+    it 'returns correct parametrization for two planes' do
+      plane1 = LinAlgRb::Plane.new(
+        normal_vector: LinAlgRb::Vector.new(0.786,0.786,0.588),
+        constant_term: -0.714
+      )
+      plane2 = LinAlgRb::Plane.new(
+        normal_vector: LinAlgRb::Vector.new(-0.138,-0.138,0.244),
+        constant_term: 0.319
+      )
+      parametrization = described_class.new(planes: [plane1, plane2]).solve
+
+      expect(parametrization.coordinates.map { |c| c.round(3) }).to eq [-1.326, 0, 0.558]
+      expect(parametrization.direction_vectors.count).to eq 1
+      expect(parametrization.direction_vectors[0].coordinates).to eq [-1.0, 1, 0.0]
+    end
+    it 'returns correct parametrization for three planes' do
+      plane1 = LinAlgRb::Plane.new(
+        normal_vector: LinAlgRb::Vector.new(8.631,5.112,-1.816),
+        constant_term: -5.113
+      )
+      plane2 = LinAlgRb::Plane.new(
+        normal_vector: LinAlgRb::Vector.new(4.315,11.132,-5.27),
+        constant_term: -6.775
+      )
+      plane3 = LinAlgRb::Plane.new(
+        normal_vector: LinAlgRb::Vector.new(-2.158,3.01,-1.727),
+        constant_term: -0.831
+      )
+      parametrization = described_class.new(planes: [plane1, plane2, plane3]).solve
+
+      expect(parametrization.coordinates.map { |c| c.round(3) }).to eq [-0.301, -0.492, 0]
+      expect(parametrization.direction_vectors.count).to eq 1
+      expect(parametrization.direction_vectors[0].coordinates.map { |c| c.round(3) }).to eq [-0.091, 0.509, 1]
+    end
+    it 'returns correct parametrization for four planes' do
+      plane1 = LinAlgRb::Plane.new(
+        normal_vector: LinAlgRb::Vector.new(0.935,1.76,-9.365),
+        constant_term: -9.955
+      )
+      plane2 = LinAlgRb::Plane.new(
+        normal_vector: LinAlgRb::Vector.new(0.187,0.352,-1.873),
+        constant_term: -1.991
+      )
+      plane3 = LinAlgRb::Plane.new(
+        normal_vector: LinAlgRb::Vector.new(0.374,0.704,-3.746),
+        constant_term: -3.982
+      )
+      plane4 = LinAlgRb::Plane.new(
+        normal_vector: LinAlgRb::Vector.new(-0.561,-1.056,5.619),
+        constant_term: 5.973
+      )
+      parametrization = described_class.new(planes: [plane1, plane2, plane3, plane4]).solve
+
+      expect(parametrization.coordinates.map { |c| c.round(3) }).to eq [-10.647, 0, 0]
+      expect(parametrization.direction_vectors.count).to eq 2
+      expect(parametrization.direction_vectors[0].coordinates.map { |c| c.round(3) }).to eq [-1.882, 1, 0]
+      expect(parametrization.direction_vectors[1].coordinates.map { |c| c.round(3) }).to eq [10.016, 0, 1]
     end
   end
   describe '#[]=' do
