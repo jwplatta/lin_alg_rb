@@ -19,6 +19,7 @@ module LinAlgRb
     end
 
     def dot(other)
+      # NOTE: For example, the dot product of [9, 7, 5] and [2, 3, 4] is 9*2+7*3 +5*4 = 59.
       raise ArgumentError.new('Vectors must have the same dimension') if other.dimension != dimension
 
       other_coordinates = other.coordinates
@@ -67,7 +68,7 @@ module LinAlgRb
         Vector.new(coordinates.map { |c| c * other })
       elsif other.is_a? Vector
         raise ArgumentError.new('Vectors must have the same dimension') if other.dimension != dimension
-        # NOTE: Hadamard product or elementwise product
+        # NOTE: Hadamard product or element-wise product
         Vector.new(
           coordinates.enum_for(:each_with_index).map do |c, index|
             c * other.coordinates[index]
