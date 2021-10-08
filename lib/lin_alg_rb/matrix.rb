@@ -164,10 +164,8 @@ module LinAlgRb
       if shape[0] == 1
         Matrix.new([[1 / coordinates[0][0].to_f]])
       elsif shape[0] == 2
-        a = coordinates[0][0]
-        b = coordinates[0][1]
-        c = coordinates[1][0]
-        d = coordinates[1][1]
+        a, b = coordinates[0]
+        c, d = coordinates[1]
 
         raise MatrixHasNoInverse.new if (a * d) == (b * c)
 
