@@ -6,8 +6,8 @@ module LinAlgRb
   end
 
   class Line
-    # NOTE: the normal vector provides the coefficients for the
-    # standard form of the line. The normal vector is used instead
+    # NOTE: the normal vector provides the coefficients for the standard
+    # form of the line, i.e. Ax + By = k. The normal vector is used instead
     # of the direction vector because the normal vector is easier to
     # generalize to higher dimensions.
     def initialize(normal_vector:, constant_term: 0)
@@ -71,7 +71,7 @@ module LinAlgRb
     def to_s
       decimal_places = 3
       vars = ('a'..'z').to_a
-      init_index = index_first_nonzero_element(normal_vector.coordinates)
+      init_index = first_nonzero_element_index(normal_vector.coordinates)
 
       terms = (0...dimension).map do |index|
         coef = normal_vector[index].round(decimal_places)
@@ -105,7 +105,7 @@ module LinAlgRb
     end
 
     def find_basepoint
-      elm_idx = index_first_nonzero_element(normal_vector.coordinates)
+      elm_idx = first_nonzero_element_index(normal_vector.coordinates)
       init_coef = normal_vector[elm_idx]
 
       ([0] * dimension).then do |basepoint_coord|
@@ -116,13 +116,13 @@ module LinAlgRb
       @basepoint = nil
     end
 
-    private
-
-    def index_first_nonzero_element(elements)
+    def first_nonzero_element_index(elements)
       elm = elements.find_index { |e| !near_zero?(e) }
       raise NoNoneZeroElements.new unless elm
       elm
     end
+
+    private
 
     def near_zero?(numeric, tolerance: 1e-10)
       numeric.abs < tolerance
