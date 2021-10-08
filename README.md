@@ -1,8 +1,16 @@
 # LinAlgRb
 
-`LinAlgRb` is a ruby library that provides a suite of resources for doing linear algebra computations.
+`LinAlgRb` is a ruby library that provides a suite of resources for doing linear algebra computations. The gem is intended to be educational.
 
 ## Installation
+
+Install locally:
+```sh
+$ gem build lin_alg_rb.gemspec
+$ gem install lin_alg_rb-0.1.0.gem
+$ gem build rulers.gemspec && gem install rulers-0.0.1.gem
+```
+
 
 Add this line to your application's Gemfile:
 
