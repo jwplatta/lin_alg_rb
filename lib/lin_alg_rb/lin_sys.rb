@@ -1,7 +1,7 @@
 module LinAlgRb
   class PlanesNotSameDimension < StandardError
     def initialize
-      super("All planes must be same dimension.")
+      super("All planes do not have same dimension.")
     end
   end
 
