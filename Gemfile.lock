@@ -50,6 +50,7 @@ GEM
 
 PLATFORMS
   x86_64-darwin-19
+  x86_64-darwin-21
 
 DEPENDENCIES
   lin_alg_rb!
@@ -59,5 +60,8 @@ DEPENDENCIES
   rspec
   rubocop (~> 1.7)
 
+RUBY VERSION
+   ruby 3.0.2p107
+
 BUNDLED WITH
-   2.2.16
+   2.2.32
