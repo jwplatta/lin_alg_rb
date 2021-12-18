@@ -137,6 +137,7 @@ module LinAlgRb
     end
 
     def to_rref
+      # NOTE: to Reduced Row Echelon Form
       tri = LinSys.new(planes: to_triangular_form.planes.map(&:clone))
 
       equation_cnt = tri.planes.count
